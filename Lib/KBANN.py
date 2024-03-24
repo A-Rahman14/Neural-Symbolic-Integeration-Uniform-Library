@@ -3,6 +3,7 @@ import numpy as np
 from sklearn import mixture
 import torch as pt
 from torch import nn
+from main import *
 
 DEFAULT_WEIGHT = 4.0
 
@@ -557,13 +558,23 @@ def main(
     y,
     feature_names,
     training_epochs,
-    rule_file_path,
-    atoms_to_add,
-):
-    # Translate rules to a network
+    mapping,
+    rule_file_path= 'converted_kbann_rules_horn.txt',
+    atoms_to_add=[],
+    use_dimacs=False,
 
-    ruleset = load_rules(rule_file_path)
-    ruleset = rewrite_rules(ruleset)
+):
+    # Choose the source of the rules based on `use_dimacs` flag
+    if use_dimacs:
+        print("Loading rules from DIMACS file...")
+        dimacs_to_kbann_rules(mapping) # Load rules directly from the hardcoded DIMACS file
+        ruleset = load_rules(rule_file_path)
+        ruleset = rewrite_rules(ruleset)
+
+    else:
+        print("Loading rules from rule file...")
+        ruleset = load_rules(rule_file_path)
+        ruleset = rewrite_rules(ruleset)
     weights, biases, layers = rule_to_network(ruleset)
 
     display(layers)
@@ -607,18 +618,37 @@ def main(
     display(biases)
     print("Rule Extraction Finished!")
 
-def dimacs_to_kbann_rules():
-    filename = "example.dimacs"
+def dimacs_to_kbann_rules(variable_mapping):
+    input_filename = "example.dimacs"
+    output_filename = "converted_kbann_rules_horn.txt"
+    print("Current Working Directory:", os.getcwd())
     ruleset = []
-    with open(filename, 'r') as file:
+
+    with open(input_filename, 'r') as file, open(output_filename, 'w') as outfile:
         for line in file:
             if line.startswith('p') or line.startswith('c'):
                 # Skip problem line and comments
                 continue
-            # Convert DIMACS clause to KBANN rule
+            # Convert DIMACS clause to a more interpretable KBANN Horn-like rule
             literals = line.strip().split()[:-1]  # Exclude the trailing 0
-            head = Literal(f"Clause_{len(ruleset)+1}", negated=False)
-            body = [Literal(f"Var_{abs(int(lit))}", negated=int(lit) < 0) for lit in literals]
-            ruleset.append(Rule(head, body))
+
+            # Process literals using the variable mapping
+            positive_literals = [int(lit) for lit in literals if not lit.startswith('-')]
+            negative_literals = [int(lit) for lit in literals if lit.startswith('-')]
+
+            if positive_literals:
+                # Assuming the last positive literal is the head (outcome)
+                head_name = variable_mapping.get(positive_literals[-1], f"Var_{positive_literals[-1]}")
+                # Body consists of the rest of the literals (conditions), with negation removed for readability
+                body_names = [variable_mapping.get(abs(lit), f"Var_{abs(lit)}") for lit in negative_literals]
+
+                rule_str = f"{head_name} :- {', '.join(body_names)}.\n"
+                outfile.write(rule_str)
+                ruleset.append(rule_str)
+
+    print(f"Converted KBANN rules saved to {output_filename}")
     return ruleset
+
+
+
 

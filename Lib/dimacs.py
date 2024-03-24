@@ -2,6 +2,7 @@ class DIMACSFormatter:
     def __init__(self, filepath=None):
         self.variables = set()
         self.clauses = []
+        self.variable_names = {}  # Mapping of variable IDs to names
         if filepath:
             self.load_from_file(filepath)
 
@@ -14,6 +15,12 @@ class DIMACSFormatter:
         for var in clause:
             self.variables.add(abs(var))
         self.clauses.append(clause)
+
+    def map_variable_names(self, variable_mapping):
+        """
+        Maps variable IDs to descriptive names.
+        """
+        self.variable_names = variable_mapping
 
     def generate_dimacs(self, filename="example.dimacs"):
         """
@@ -36,9 +43,7 @@ class DIMACSFormatter:
         with open(filepath, 'r') as file:
             for line in file:
                 if line.startswith('p') or line.startswith('c'):
-                    # Skip problem line and comments
                     continue
-                # Convert DIMACS line to a clause and add it
                 clause = [int(x) for x in line.strip().split()[:-1]]  # Exclude the trailing 0
                 self.add_clause(clause)
 
@@ -48,3 +53,4 @@ class DIMACSFormatter:
         """
         self.variables.clear()
         self.clauses.clear()
+        self.variable_names.clear()

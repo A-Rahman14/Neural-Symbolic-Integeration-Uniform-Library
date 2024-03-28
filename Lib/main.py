@@ -92,7 +92,29 @@ if __name__ == "__main__":
             #     Forall(x_A, A(x_A)),
             #     Forall(x_not_A, Not(A(x_not_A)))
             # )
-            mean_sat += SatAgg(exec(formulas[0]), exec(formulas[1]))
+            Not = ltn.Connective(ltn.fuzzy_ops.NotStandard())
+            Forall = ltn.Quantifier(ltn.fuzzy_ops.AggregPMeanError(p=2), quantifier="f")
+            SatAgg = ltn.fuzzy_ops.SatAgg()
+
+            formulas_str = [
+                "Forall(x_A, A(x_A))",
+                "Forall(x_not_A, Not(A(x_not_A)))"
+            ]
+
+            mean_sat = 0
+
+            for formula_str in formulas_str:
+                context = {
+                    'Forall': Forall,
+                    'Not': Not,
+                    'A': A  # Assume 'A' is some predicate defined elsewhere in your code
+                    
+                }
+                exec(f"formula_obj = {formula_str}", context, context)
+                mean_sat += SatAgg(context['formula_obj'])
+
+            print("Mean Satisfaction Level:", mean_sat)
+
         mean_sat /= len(loader)
         return mean_sat
 

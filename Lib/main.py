@@ -2,7 +2,6 @@ from dimacs import *
 from KBANN import *
 from gavel.dialects.tptp.parser import *
 import torch
-import matplotlib.pyplot as plt
 from ltn_wrapper import *
 from sklearn.metrics import accuracy_score
 import numpy as np
@@ -92,28 +91,34 @@ if __name__ == "__main__":
             #     Forall(x_A, A(x_A)),
             #     Forall(x_not_A, Not(A(x_not_A)))
             # )
-            Not = ltn.Connective(ltn.fuzzy_ops.NotStandard())
-            Forall = ltn.Quantifier(ltn.fuzzy_ops.AggregPMeanError(p=2), quantifier="f")
-            SatAgg = ltn.fuzzy_ops.SatAgg()
+            # Define an empty list to store evaluated arguments
+            args_list = []
 
-            formulas_str = [
-                "Forall(x_A, A(x_A))",
-                "Forall(x_not_A, Not(A(x_not_A)))"
-            ]
+            # Loop through each formula in the list and evaluate it
+            for formula in formulas:
+                args_list.append(eval(formula))
 
-            mean_sat = 0
+            # Create a SatAgg instance with the evaluated arguments
+            mean_sat += SatAgg(*args_list)
 
-            for formula_str in formulas_str:
-                context = {
-                    'Forall': Forall,
-                    'Not': Not,
-                    'A': A  # Assume 'A' is some predicate defined elsewhere in your code
+            # formulas_str = [
+            #     "Forall(x_A, A(x_A))",
+            #     "Forall(x_not_A, Not(A(x_not_A)))"
+            # ]
+
+            # mean_sat = 0
+
+            # for formula_str in formulas_str:
+            #     context = {
+            #         'Forall': Forall,
+            #         'Not': Not,
+            #         'A': A  # Assume 'A' is some predicate defined elsewhere in your code
                     
-                }
-                exec(f"formula_obj = {formula_str}", context, context)
-                mean_sat += SatAgg(context['formula_obj'])
+            #     }
+            #     exec(f"formula_obj = {formula_str}", context, context)
+            #     mean_sat += SatAgg(context['formula_obj'])
 
-            print("Mean Satisfaction Level:", mean_sat)
+            # print("Mean Satisfaction Level:", mean_sat)
 
         mean_sat /= len(loader)
         return mean_sat
@@ -147,10 +152,19 @@ if __name__ == "__main__":
             # we ground the variables with current batch data
             x_A = ltn.Variable("x_A", data[torch.nonzero(labels)])  # positive examples
             x_not_A = ltn.Variable("x_not_A", data[torch.nonzero(torch.logical_not(labels))])  # negative examples
-            sat_agg = SatAgg(
-                Forall(x_A, A(x_A)),
-                Forall(x_not_A, Not(A(x_not_A)))
-            )
+            # sat_agg = SatAgg(
+            #     Forall(x_A, A(x_A)),
+            #     Forall(x_not_A, Not(A(x_not_A)))
+            # )
+            # Define an empty list to store evaluated arguments
+            args_list = []
+
+            # Loop through each formula in the list and evaluate it
+            for formula in formulas:
+                args_list.append(eval(formula))
+
+            # Create a SatAgg instance with the evaluated arguments
+            sat_agg = SatAgg(*args_list)
             loss = 1. - sat_agg
             loss.backward()
             optimizer.step()

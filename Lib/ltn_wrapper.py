@@ -59,17 +59,66 @@ def convert_to_ltn(formula):
     # Handle other types of formulas as needed.
     return ""
 
-# Assuming you have a parser and the string is parsed to 'structure',
-# which is a list containing your TPTP parsed objects.
-# parser = TPTPParser()
+def convert_to_kbann_horn(formula):
+    if isinstance(formula, AnnotatedFormula):
+        return convert_to_kbann_horn(formula.formula)
+    elif isinstance(formula, QuantifiedFormula):
+        # Handling quantifiers (existential or universal)
+        quantifier = formula.quantifier.name.lower()
+        variable = lowercase_first_letter(formula.variables[0].symbol)
+        subformula = convert_to_kbann_horn(formula.formula)
+        if quantifier == 'universal':
+            return f"Forall {variable}, {subformula}"
+        elif quantifier == 'existential':
+            return f"Exists {variable}, {subformula}"
+    elif isinstance(formula, BinaryFormula):
+        # Binary formulas could include implications which are direct candidates for Horn clauses
+        operator = formula.operator.name.lower()
+        if operator == 'implication':
+            head = convert_to_kbann_horn(formula.right)  # head is the consequent of the implication
+            body = convert_to_kbann_horn(formula.left)   # body is the antecedent
+            if isinstance(body, tuple) and body[0] == 'conjunction':
+                # Flatten the conjunction into a comma-separated string
+                body = ', '.join(body[1:])
+            return f"{head} :- {body}"
+        else:
+            # Other binary operations need to be handled appropriately
+            left = convert_to_kbann_horn(formula.left)
+            right = convert_to_kbann_horn(formula.right)
+            return handle_binary_operator(operator, left, right)
+    elif isinstance(formula, UnaryFormula):
+        # Unary formulas like negation
+        subformula = convert_to_kbann_horn(formula.formula)
+        connective = formula.connective.name.lower()
+        return (connective, subformula)
+    elif isinstance(formula, Constant):
+        # Constants directly return their symbol
+        symbol = lowercase_first_letter(formula.symbol)
+        return symbol
+    elif isinstance(formula, PredicateExpression):
+        # Predicate expressions are usually the leaves of the formula tree
+        predicate = capitalize_first_letter(formula.predicate)
+        arguments = ', '.join([lowercase_first_letter(arg.symbol) for arg in formula.arguments])
+        return f"{predicate}({arguments})"
 
-# string = "fof(mortal_humans, axiom, ![X]: ((cube(X) & small(X)) => ?[Y]: leftOf(X,Y)))."
-# string = "cnf(a1, axiom, a | b).cnf(a1, axiom, ~a).cnf(a2, negated_conjecture, b)."
-#
-# for line in parser.stream_lines(string):
-#     structure = parser.parse(line)
-#     if structure:
-#         ltn_formula = convert_to_ltn(structure[0].formula)
-#         print(ltn_formula)
-#         # print(structure[0].formula)
+def handle_binary_operator(operator, left, right):
+    if operator == 'conjunction':
+        # This will handle nested conjunctions and return a flat list
+        left_items = [left] if not isinstance(left, tuple) or left[0] != 'conjunction' else left[1:]
+        right_items = [right] if not isinstance(right, tuple) or right[0] != 'conjunction' else right[1:]
+        return ('conjunction', *left_items, *right_items)
+    elif operator == 'disjunction':
+        return f"({left} OR {right})"
+    else:
+        return f"({left} {operator.upper()} {right})"
+
+def capitalize_first_letter(symbol):
+    return symbol[0].upper() + symbol[1:] if symbol and symbol[0].islower() else symbol
+
+def lowercase_first_letter(symbol):
+    return symbol[0].lower() + symbol[1:] if symbol and symbol[0].isupper() else symbol
+
+
+
+
 

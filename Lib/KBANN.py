@@ -3,7 +3,6 @@ import numpy as np
 from sklearn import mixture
 import torch as pt
 from torch import nn
-from main import *
 
 DEFAULT_WEIGHT = 4.0
 
@@ -562,12 +561,13 @@ def main(
     rule_file_path= 'converted_kbann_rules_horn.txt',
     atoms_to_add=[],
     use_dimacs=False,
+    input_filename="example.dimacs"
 
 ):
     # Choose the source of the rules based on `use_dimacs` flag
     if use_dimacs:
         print("Loading rules from DIMACS file...")
-        dimacs_to_kbann_rules(mapping) # Load rules directly from the hardcoded DIMACS file
+        dimacs_to_kbann_rules(mapping, input_filename) # Load rules directly from the hardcoded DIMACS file
         ruleset = load_rules(rule_file_path)
         ruleset = rewrite_rules(ruleset)
 
@@ -618,8 +618,8 @@ def main(
     display(biases)
     print("Rule Extraction Finished!")
 
-def dimacs_to_kbann_rules(variable_mapping):
-    input_filename = "example.dimacs"
+def dimacs_to_kbann_rules(variable_mapping, input_filename):
+    # input_filename = "example.dimacs"
     output_filename = "converted_kbann_rules_horn.txt"
     print("Current Working Directory:", os.getcwd())
     ruleset = []

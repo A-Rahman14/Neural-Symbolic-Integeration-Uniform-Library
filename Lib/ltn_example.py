@@ -2,6 +2,7 @@ import torch
 from sklearn.metrics import accuracy_score
 import numpy as np
 from ltn_wrapper import *
+from formula_class import *
 
 class ModelA(torch.nn.Module):
     def __init__(self):
@@ -27,6 +28,13 @@ def ltn_example():
             ltn_formula = convert_to_ltn(structure[0].formula)
             formulas.append(ltn_formula)
     print(formulas)
+
+    string = "fof(all_A, axiom, ![X_A]: ((a(X_A)))).fof(all_not_A, axiom, ![X_not_A]: ((~a(X_not_A))))."
+
+
+    LTNFormulaTest = FormulaConverter(string, 'ltn')
+
+    print(LTNFormulaTest.convert())
 
     A = ltn.Predicate(ModelA())
     Not = ltn.Connective(ltn.fuzzy_ops.NotStandard())

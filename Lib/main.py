@@ -4,17 +4,17 @@ from gavel.logic.problem import AnnotatedFormula
 from ltn_example import *
 from kbann_example import *
 
-parser = TPTPParser()
-# string = "cnf(name, axiom, a | b)."
-string = "fof(scholarship_rule, axiom, (take_course & has_superviser) => scholarship_candidate)."
-formulas = []
-
-for line in parser.stream_lines(string):
-    structure = parser.parse(line)
-    if structure:
-        ltn_formula = convert_to_kbann_horn(structure[0].formula)
-        formulas.append(ltn_formula)
-print(formulas)
+# parser = TPTPParser()
+# # string = "cnf(name, axiom, a | b)."
+# string = "fof(scholarship_rule, axiom, (take_course & has_superviser) => scholarship_candidate)."
+# formulas = []
+#
+# for line in parser.stream_lines(string):
+#     structure = parser.parse(line)
+#     if structure:
+#         ltn_formula = convert_to_kbann_horn(structure[0].formula)
+#         formulas.append(ltn_formula)
+# print(formulas)
 
 
 # for line in parser.stream_lines(string):
@@ -64,34 +64,34 @@ print(formulas)
 
 #
 #
-# if __name__ == "__main__":
-#     kbann_example()
-#     # ltn_example()
+if __name__ == "__main__":
+    # kbann_example()
+    ltn_example()
 
 
 import trace
 import sys
 
-# Import your modules
-from ltn_example import *
-from kbann_example import *
-from KBANN import *
-
-def trace_calls(frame, event, arg):
-    if event != 'call':
-        return
-    co = frame.f_code
-    filename = co.co_filename
-    # Check if the filename ends with one of your specified files
-    if filename.endswith(('main.py', 'kbann_example.py', 'KBANN.py')):
-        print('Call to {} on line {} of {}'.format(co.co_name, frame.f_lineno, filename))
-        return trace_calls
-    return None
-
-if __name__ == "__main__":
-    # Set the trace function
-    sys.settrace(trace_calls)
-    # Call the function you want to trace
-    kbann_example()
-    # Disable tracing
-    sys.settrace(None)
+# # Import your modules
+# from ltn_example import *
+# from kbann_example import *
+# from KBANN import *
+#
+# def trace_calls(frame, event, arg):
+#     if event != 'call':
+#         return
+#     co = frame.f_code
+#     filename = co.co_filename
+#     # Check if the filename ends with one of your specified files
+#     if filename.endswith(('main.py', 'kbann_example.py', 'KBANN.py')):
+#         print('Call to {} on line {} of {}'.format(co.co_name, frame.f_lineno, filename))
+#         return trace_calls
+#     return None
+#
+# if __name__ == "__main__":
+#     # Set the trace function
+#     sys.settrace(trace_calls)
+#     # Call the function you want to trace
+#     kbann_example()
+#     # Disable tracing
+#     sys.settrace(None)

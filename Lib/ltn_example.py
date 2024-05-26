@@ -20,21 +20,22 @@ class ModelA(torch.nn.Module):
 
 def ltn_example():
     parser = TPTPParser()
-    string = "fof(all_A, axiom, ![X_A]: ((a(X_A)))).fof(all_not_A, axiom, ![X_not_A]: ((~a(X_not_A))))."
+    # string = "fof(all_A, axiom, ![X_A]: ((a(X_A)))).fof(all_not_A, axiom, ![X_not_A]: ((~a(X_not_A))))."
     formulas = []
-    for line in parser.stream_lines(string):
-        structure = parser.parse(line)
-        if structure:
-            ltn_formula = convert_to_ltn(structure[0].formula)
-            formulas.append(ltn_formula)
-    print(formulas)
+    # for line in parser.stream_lines(string):
+    #     structure = parser.parse(line)
+    #     if structure:
+    #         ltn_formula = convert_to_ltn(structure[0].formula)
+    #         formulas.append(ltn_formula)
+    # print(formulas)
 
     string = "fof(all_A, axiom, ![X_A]: ((a(X_A)))).fof(all_not_A, axiom, ![X_not_A]: ((~a(X_not_A))))."
 
 
     LTNFormulaTest = FormulaConverter(string, 'ltn')
-
-    # print(LTNFormulaTest.convert())
+    print("LTNFormulaTest: ")
+    formulas = LTNFormulaTest.convert()
+    print(formulas)
 
     A = ltn.Predicate(ModelA())
     Not = ltn.Connective(ltn.fuzzy_ops.NotStandard())

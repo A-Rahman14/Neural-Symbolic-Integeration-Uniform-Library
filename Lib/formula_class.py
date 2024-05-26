@@ -1,6 +1,7 @@
 import ltn
 from gavel.dialects.tptp.parser import *
 from gavel.logic.logic import *
+from lnn import Proposition, And, Or, Not, Implies, Fact
 
 
 class FormulaConverter:
@@ -32,9 +33,9 @@ class FormulaConverter:
         formulas = []
         for line in self.parser.stream_lines(self.input_data):
             structure = self.parser.parse(line)
-            print("Error Line")
+            # print("Error Line")
             # print(structure[0].formula)
-            print(structure)
+            # print(structure)
             if structure:
                 formula = self._convert_formula(structure[0].formula)
                 formulas.append(formula)
@@ -92,7 +93,6 @@ class FormulaConverter:
         if isinstance(formula, AnnotatedFormula):
             return self._convert_to_kbann_horn(formula.formula)
         elif isinstance(formula, QuantifiedFormula):
-            # Handling quantifiers (existential or universal)
             quantifier = formula.quantifier.name.lower()
             variable = self._lowercase_first_letter(formula.variables[0].symbol)
             subformula = self._convert_to_kbann_horn(formula.formula)
@@ -101,38 +101,31 @@ class FormulaConverter:
             elif quantifier == 'existential':
                 return f"Exists {variable}, {subformula}"
         elif isinstance(formula, BinaryFormula):
-            # Binary formulas could include implications which are direct candidates for Horn clauses
             operator = formula.operator.name.lower()
             if operator == 'implication':
-                head = self._convert_to_kbann_horn(formula.right)  # head is the consequent of the implication
-                body = self._convert_to_kbann_horn(formula.left)  # body is the antecedent
+                head = self._convert_to_kbann_horn(formula.right)
+                body = self._convert_to_kbann_horn(formula.left)
                 if isinstance(body, tuple) and body[0] == 'conjunction':
-                    # Flatten the conjunction into a comma-separated string
                     body = ', '.join(body[1:])
                 return f"{head} :- {body}"
             else:
-                # Other binary operations need to be handled appropriately
                 left = self._convert_to_kbann_horn(formula.left)
                 right = self._convert_to_kbann_horn(formula.right)
                 return self._handle_binary_operator(operator, left, right)
         elif isinstance(formula, UnaryFormula):
-            # Unary formulas like negation
             subformula = self._convert_to_kbann_horn(formula.formula)
             connective = formula.connective.name.lower()
             return (connective, subformula)
         elif isinstance(formula, Constant):
-            # Constants directly return their symbol
             symbol = self._lowercase_first_letter(formula.symbol)
             return symbol
         elif isinstance(formula, PredicateExpression):
-            # Predicate expressions are usually the leaves of the formula tree
             predicate = self._capitalize_first_letter(formula.predicate)
             arguments = ', '.join([self._lowercase_first_letter(arg.symbol) for arg in formula.arguments])
             return f"{predicate}({arguments})"
 
     def _handle_binary_operator(self, operator, left, right):
         if operator == 'conjunction':
-            # This will handle nested conjunctions and return a flat list
             left_items = [left] if not isinstance(left, tuple) or left[0] != 'conjunction' else left[1:]
             right_items = [right] if not isinstance(right, tuple) or right[0] != 'conjunction' else right[1:]
             return 'conjunction', *left_items, *right_items
@@ -140,6 +133,7 @@ class FormulaConverter:
             return f"({left} OR {right})"
         else:
             return f"({left} {operator.upper()} {right})"
+
 
 
 # # Example usage for string input

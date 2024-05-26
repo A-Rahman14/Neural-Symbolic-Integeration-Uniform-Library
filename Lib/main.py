@@ -65,8 +65,8 @@ from kbann_example import *
 #
 #
 if __name__ == "__main__":
-    # kbann_example()
-    ltn_example()
+    kbann_example()
+    # ltn_example()
 
 
 import trace

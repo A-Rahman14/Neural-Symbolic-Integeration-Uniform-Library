@@ -1,8 +1,25 @@
 from KBANN import *
 from dimacs import *
 from KBANN import dimacs_to_kbann_rules
+from formula_class import FormulaConverter
 
 def kbann_example():
+    kbann_tptp = "fof(scholarship_candidate, axiom, ((take_course & has_supervisor) => scholarship_candidate)).fof(has_supervisor, axiom, (grad_student => has_supervisor)).fof(take_course, axiom,(grad_student => take_course))."
+    LTNFormulaTest = FormulaConverter(kbann_tptp, 'kbann')
+    print("LTNFormulaTest: ")
+    formulas = LTNFormulaTest.convert()
+    print(formulas)
+
+    def format_formulas(formulas):
+        formatted = []
+        for formula in formulas:
+            formatted.append(formula)
+        file_data = '.\n'.join(formatted) + '.'
+        with open('tptp_kbann_rules_horn.txt', 'w') as file:
+            file.write(file_data)
+
+    format_formulas(formulas)
+
     variable_mapping = {
         1: "grad_student",
         2: "has_supervisor",

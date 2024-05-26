@@ -568,13 +568,11 @@ def main(
     if use_dimacs:
         print("Loading rules from DIMACS file...")
         dimacs_to_kbann_rules(mapping, input_filename) # Load rules directly from the hardcoded DIMACS file
-        ruleset = load_rules(rule_file_path)
-        ruleset = rewrite_rules(ruleset)
 
     else:
         print("Loading rules from rule file...")
-        ruleset = load_rules(rule_file_path)
-        ruleset = rewrite_rules(ruleset)
+    ruleset = load_rules(rule_file_path)
+    ruleset = rewrite_rules(ruleset)
     weights, biases, layers = rule_to_network(ruleset)
 
     display(layers)

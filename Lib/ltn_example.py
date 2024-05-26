@@ -34,7 +34,7 @@ def ltn_example():
 
     LTNFormulaTest = FormulaConverter(string, 'ltn')
 
-    print(LTNFormulaTest.convert())
+    # print(LTNFormulaTest.convert())
 
     A = ltn.Predicate(ModelA())
     Not = ltn.Connective(ltn.fuzzy_ops.NotStandard())

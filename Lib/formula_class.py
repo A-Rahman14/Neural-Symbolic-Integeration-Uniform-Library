@@ -33,7 +33,7 @@ class FormulaConverter:
         for line in self.parser.stream_lines(self.input_data):
             structure = self.parser.parse(line)
             print("Error Line")
-            print(structure[0].formula)
+            # print(structure[0].formula)
             print(structure)
             if structure:
                 formula = self._convert_formula(structure[0].formula)
@@ -142,12 +142,12 @@ class FormulaConverter:
             return f"({left} {operator.upper()} {right})"
 
 
-# Example usage for string input
-string_input = "fof(all_A, axiom, ![X_A]: ((a(X_A)))).fof(all_not_A, axiom, ![X_not_A]: ((~a(X_not_A))))"
-converter_ltn = FormulaConverter(string_input, 'ltn')
-print(converter_ltn.convert())
-
-# Example usage for file input
-file_path = 'path/to/tptp_file.p'
-converter_file_ltn = FormulaConverter(file_path, 'ltn', is_file=True)
-print(converter_file_ltn.convert())
+# # Example usage for string input
+# string_input = "fof(all_A, axiom, ![X_A]: ((a(X_A)))).fof(all_not_A, axiom, ![X_not_A]: ((~a(X_not_A))))"
+# converter_ltn = FormulaConverter(string_input, 'ltn')
+# print(converter_ltn.convert())
+#
+# # Example usage for file input
+# file_path = 'path/to/tptp_file.p'
+# converter_file_ltn = FormulaConverter(file_path, 'ltn', is_file=True)
+# print(converter_file_ltn.convert())

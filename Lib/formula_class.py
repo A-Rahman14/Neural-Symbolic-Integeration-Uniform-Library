@@ -1,7 +1,7 @@
 import ltn
 from gavel.dialects.tptp.parser import *
 from gavel.logic.logic import *
-from lnn import Proposition, And, Or, Not, Implies, Fact
+# from lnn import Proposition, And, Or, Not, Implies, Fact
 
 
 class FormulaConverter:

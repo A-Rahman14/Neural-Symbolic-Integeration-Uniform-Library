@@ -33,22 +33,19 @@ class FormulaConverter:
         formulas = []
         for line in self.parser.stream_lines(self.input_data):
             structure = self.parser.parse(line)
-            # print("Error Line")
-            # print(structure[0].formula)
-            # print(structure)
             if structure:
                 formula = self._convert_formula(structure[0].formula)
                 formulas.append(formula)
         return formulas
 
     def _read_file(self):
-        with open(self.input_data, 'r') as file:
+        with open(self.input_data, "r") as file:
             return file.read()
 
     def _convert_formula(self, formula):
-        if self.method == 'ltn':
+        if self.method == "ltn":
             return self._convert_to_ltn(formula)
-        elif self.method == 'kbann':
+        elif self.method == "kbann":
             return self._convert_to_kbann_horn(formula)
         else:
             raise ValueError("Unsupported conversion method")
@@ -60,31 +57,31 @@ class FormulaConverter:
             quantifier = formula.quantifier.name.lower()
             variable = self._lowercase_first_letter(formula.variables[0].symbol)
             subformula = self._convert_to_ltn(formula.formula)
-            if quantifier == 'universal':
+            if quantifier == "universal":
                 return f"Forall({variable}, {subformula})"
-            elif quantifier == 'existential':
+            elif quantifier == "existential":
                 return f"Exists({variable}, {subformula})"
         elif isinstance(formula, BinaryFormula):
             left = self._convert_to_ltn(formula.left)
             right = self._convert_to_ltn(formula.right)
             operator = formula.operator.name.lower()
-            if operator == 'conjunction':
+            if operator == "conjunction":
                 return f"And({left}, {right})"
-            elif operator == 'disjunction':
+            elif operator == "disjunction":
                 return f"Or({left}, {right})"
-            elif operator == 'implication':
+            elif operator == "implication":
                 return f"Implies({left}, {right})"
         elif isinstance(formula, UnaryFormula):
             subformula = self._convert_to_ltn(formula.formula)
             connective = formula.connective.name.lower()
-            if connective == 'negation':
+            if connective == "negation":
                 return f"Not({subformula})"
         elif isinstance(formula, Constant):
             symbol = self._lowercase_first_letter(formula.symbol)
             return symbol
         elif isinstance(formula, PredicateExpression):
             predicate = self._capitalize_first_letter(formula.predicate)
-            arguments = ', '.join([self._lowercase_first_letter(arg.symbol) for arg in formula.arguments])
+            arguments = ", ".join([self._lowercase_first_letter(arg.symbol) for arg in formula.arguments])
             return f"{predicate}({arguments})"
         # Handle other types of formulas as needed.
         return ""
@@ -96,17 +93,17 @@ class FormulaConverter:
             quantifier = formula.quantifier.name.lower()
             variable = self._lowercase_first_letter(formula.variables[0].symbol)
             subformula = self._convert_to_kbann_horn(formula.formula)
-            if quantifier == 'universal':
+            if quantifier == "universal":
                 return f"Forall {variable}, {subformula}"
-            elif quantifier == 'existential':
+            elif quantifier == "existential":
                 return f"Exists {variable}, {subformula}"
         elif isinstance(formula, BinaryFormula):
             operator = formula.operator.name.lower()
-            if operator == 'implication':
+            if operator == "implication":
                 head = self._convert_to_kbann_horn(formula.right)
                 body = self._convert_to_kbann_horn(formula.left)
-                if isinstance(body, tuple) and body[0] == 'conjunction':
-                    body = ', '.join(body[1:])
+                if isinstance(body, tuple) and body[0] == "conjunction":
+                    body = ", ".join(body[1:])
                 return f"{head} :- {body}"
             else:
                 left = self._convert_to_kbann_horn(formula.left)
@@ -121,27 +118,15 @@ class FormulaConverter:
             return symbol
         elif isinstance(formula, PredicateExpression):
             predicate = self._capitalize_first_letter(formula.predicate)
-            arguments = ', '.join([self._lowercase_first_letter(arg.symbol) for arg in formula.arguments])
+            arguments = ", ".join([self._lowercase_first_letter(arg.symbol) for arg in formula.arguments])
             return f"{predicate}({arguments})"
 
     def _handle_binary_operator(self, operator, left, right):
-        if operator == 'conjunction':
-            left_items = [left] if not isinstance(left, tuple) or left[0] != 'conjunction' else left[1:]
-            right_items = [right] if not isinstance(right, tuple) or right[0] != 'conjunction' else right[1:]
-            return 'conjunction', *left_items, *right_items
-        elif operator == 'disjunction':
+        if operator == "conjunction":
+            left_items = [left] if not isinstance(left, tuple) or left[0] != "conjunction" else left[1:]
+            right_items = [right] if not isinstance(right, tuple) or right[0] != "conjunction" else right[1:]
+            return "conjunction", *left_items, *right_items
+        elif operator == "disjunction":
             return f"({left} OR {right})"
         else:
             return f"({left} {operator.upper()} {right})"
-
-
-
-# # Example usage for string input
-# string_input = "fof(all_A, axiom, ![X_A]: ((a(X_A)))).fof(all_not_A, axiom, ![X_not_A]: ((~a(X_not_A))))"
-# converter_ltn = FormulaConverter(string_input, 'ltn')
-# print(converter_ltn.convert())
-#
-# # Example usage for file input
-# file_path = 'path/to/tptp_file.p'
-# converter_file_ltn = FormulaConverter(file_path, 'ltn', is_file=True)
-# print(converter_file_ltn.convert())

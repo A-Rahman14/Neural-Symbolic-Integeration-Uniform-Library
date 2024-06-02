@@ -30,7 +30,7 @@ class DIMACSFormatter:
         clauses_str = "\n".join(" ".join(map(str, clause)) + " 0" for clause in self.clauses)
         dimacs_string = header + clauses_str
 
-        with open(filename, 'w') as file:
+        with open(filename, "w") as file:
             file.write(dimacs_string)
 
         print(f"Saved DIMACS to {filename}")
@@ -40,9 +40,9 @@ class DIMACSFormatter:
         """
         Loads clauses from a DIMACS format file.
         """
-        with open(filepath, 'r') as file:
+        with open(filepath, "r") as file:
             for line in file:
-                if line.startswith('p') or line.startswith('c'):
+                if line.startswith("p") or line.startswith("c"):
                     continue
                 clause = [int(x) for x in line.strip().split()[:-1]]  # Exclude the trailing 0
                 self.add_clause(clause)

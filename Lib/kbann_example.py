@@ -57,5 +57,5 @@ def kbann_example():
         atoms_to_add=atoms_to_add,
         use_dimacs=True,
         mapping = variable_mapping,
-        input_filename = "example1.dimacs"
+        # input_filename = "example1.dimacs"
     )

@@ -1,3 +1,0 @@
-Clause_1 :- NOT Var_3, NOT Var_2, Var_4
-Clause_2 :- NOT Var_1, Var_2
-Clause_3 :- NOT Var_1, Var_3

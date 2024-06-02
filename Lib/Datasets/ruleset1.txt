@@ -1,5 +1,0 @@
-A :- B, Z.
-B :- C, D.
-B :- E, F, G.
-Z :- Y, not X.
-Y :- S, T.

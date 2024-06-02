@@ -1,3 +1,0 @@
-scholarship_candidate :- take_course, has_supervisor.
-has_supervisor :- grad_student.
-take_course :- grad_student.
